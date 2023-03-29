@@ -1,18 +1,26 @@
 import requests
+import bs4
 from bs4 import BeautifulSoup
 import re
 
-data = requests.get("https://www.shodan.io/search?query=cloudflare")
+# data = requests.get("https://www.shodan.io/search?query=cloudflare")
+# print(data.text)
+with open('index.html') as f:
+    soup = BeautifulSoup(f.read(), features="html.parser")
+errors = soup.find_all("div", {"class": "alert alert-error"})
+if errors:
+    for error in errors:
+        print("Error: ")
+        print(error.find('p').text)
+print()
 
-soup = BeautifulSoup(data.text, features="html.parser")
 results = soup.find_all("div", {"class": "result"})
 page_number = 0
 
 for result in results:
 
-    check_cdn = result.find("a", {"class": "tag"})
+    check_cdn: bs4.element.Tag = result.find("a", {"class": "tag"})
     if check_cdn.text == 'cdn':
-        
         print('=' * 30)
         
         title = (result.find("a", {"class": "title text-dark"}))
